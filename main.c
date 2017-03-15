@@ -6,10 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <limits.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include "matrix.h"
+
 
 // read in the test file and generate two matrices
 // 2d^2 total lines
