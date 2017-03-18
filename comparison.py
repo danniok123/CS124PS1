@@ -19,6 +19,7 @@ strassenTwo = []
 
 
 def matrix_generation(d):
+    # create file with matrix that has values 0, 1
     temporaryList = []
     for _ in range(1, 2 * d**2 + 1):
         temporaryList.append(random.randint(0, 1))
@@ -26,6 +27,7 @@ def matrix_generation(d):
     for item in temporaryList:
         file.write("%s\n" % item)
 
+    # create file with matrix that has values -1, 0, 1
     temporaryList = []
     for _ in range(1, 2 * d**2 + 1):
         temporaryList.append(random.randint(-1, 1))
@@ -33,9 +35,10 @@ def matrix_generation(d):
     for item in temporaryList:
         file.write("%s\n" % item)
 
+    # create file with matrix that has values 1, 2, 3
     temporaryList = []
     for _ in range(1, 2 * d**2 + 1):
-        temporaryList.append(random.randint(-1, 1))
+        temporaryList.append(random.randint(1, 3))
     file = open('onetoThree.txt', 'w')
     for item in temporaryList:
         file.write("%s\n" % item)
