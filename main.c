@@ -18,7 +18,7 @@ int **newMatrix(int d) {
 
     // allocating memory for each row in the matrix
     for (int i = 0; i < d; i++){
-        m[i] = (int *) malloc(d * sizeof(int));
+        m[i] = (int *) calloc(d, sizeof(int));
     }
 
     return m;
@@ -57,7 +57,8 @@ int **add_matrix(int **a, int **b, int d, int neg) {
 }
 
 
-void standardmult(int **a, int **b, int **c, int d) {
+int **standardmult(int **a, int **b, int **c, int d) {
+    //int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
             for (int k = 0; k < d; k++) {
@@ -65,6 +66,7 @@ void standardmult(int **a, int **b, int **c, int d) {
             }
         }
     }
+    return c;
 }
 
 // Freeing the matrix
@@ -77,10 +79,12 @@ void freeMatrix(int d, int **a) {
 }
 
 // Strassen's algorithm
-void strassen(int **x, int **y, int **z, int dim) {
+int **strassen(int **x, int **y, int dim) {
+
+    int **z = newMatrix(dim);
     
     if (dim <= threshold)
-        standardmult(x, y, z, dim);
+        return standardmult(x, y, z, dim);
 
     else {
         int half = dim / 2;
@@ -93,14 +97,6 @@ void strassen(int **x, int **y, int **z, int dim) {
         int **f = newMatrix(half);
         int **g = newMatrix(half);
         int **h = newMatrix(half);
-
-        int **p1 = newMatrix(half);
-        int **p2 = newMatrix(half);
-        int **p3 = newMatrix(half);
-        int **p4 = newMatrix(half);
-        int **p5 = newMatrix(half);
-        int **p6 = newMatrix(half);
-        int **p7 = newMatrix(half);
 
         for (int i = 0; i < half; i++) {
             for (int j = 0; j < half; j++) {
@@ -115,13 +111,13 @@ void strassen(int **x, int **y, int **z, int dim) {
             }
         }
 
-        strassen(a, add_matrix(f, h, half, -1), p1, half); // A(F - H)
-        strassen(add_matrix(a, b, half, 1), h, p2, half); // (A + B)H
-        strassen(add_matrix(c, d, half, 1), e, p3, half); // (C + D)H
-        strassen(d, add_matrix(g, e, half, -1), p4, half); // D(G - E)
-        strassen(add_matrix(a, d, half, 1), add_matrix(e, h, half, 1), p5, half); // (A + D)(E + H)
-        strassen(add_matrix(b, d, half, -1), add_matrix(g, h, half, 1), p6, half); // (B - D)(G + H)
-        strassen(add_matrix(a, c, half, -1), add_matrix(e, f, half, 1), p7, half); // (A - C)(E + F)
+        int **p1 = strassen(a, add_matrix(f, h, half, -1), half); // A(F - H)
+        int **p2 = strassen(add_matrix(a, b, half, 1), h, half); // (A + B)H
+        int **p3 = strassen(add_matrix(c, d, half, 1), e, half); // (C + D)H
+        int **p4 = strassen(d, add_matrix(g, e, half, -1), half); // D(G - E)
+        int **p5 = strassen(add_matrix(a, d, half, 1), add_matrix(e, h, half, 1), half); // (A + D)(E + H)
+        int **p6 = strassen(add_matrix(b, d, half, -1), add_matrix(g, h, half, 1), half); // (B - D)(G + H)
+        int **p7 = strassen(add_matrix(a, c, half, -1), add_matrix(e, f, half, 1), half); // (A - C)(E + F)
 
         // AE + BG = P5 + P4 - P2 + P6
         int **z11 = add_matrix(p5, add_matrix(p4, add_matrix(p6, p2, half, -1), half, 1), half, 1);
@@ -143,11 +139,14 @@ void strassen(int **x, int **y, int **z, int dim) {
                 z[i + half][j + half] = z22[i][j];
             }
         }
+
         freeMatrix(half, a); freeMatrix(half, b); freeMatrix(half, c); freeMatrix(half, d);
         freeMatrix(half, e); freeMatrix(half, f); freeMatrix(half, g); freeMatrix(half, h);
         freeMatrix(half, p1); freeMatrix(half, p2); freeMatrix(half, p3); freeMatrix(half, p4);
         freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7); freeMatrix(half, z11);
         freeMatrix(half, z12); freeMatrix(half, z21); freeMatrix(half, z22);
+
+        return z;
     }
 }
 
@@ -210,9 +209,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    int **c = newMatrix(dimension);
+    if (flag == 2) {
+        int **x = genrand_Matrix(dimension);
+        int **y = genrand_Matrix(dimension);
 
-    strassen(a, b, c, dimension);
+        
+    }
+
+
+    int **c = strassen(a, b, dimension);
 
     // only print the diagonals, ignore the paddings
     for (int i = 0; i < dimension; i++){
