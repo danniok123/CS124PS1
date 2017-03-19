@@ -14,8 +14,8 @@ import random
 files = ['zeroOne.txt', 'negOnetoOne.txt', 'onetoThree.txt']
 
 # dimensions to test
-# ns = [2**x for x in range(0, 12)] + [2**x + 1 for x in range(0, 12)]
-ns = [1, 2, 3, 4, 5]
+ns = [x for x in range(1, 2049)]
+# ns = [1, 2, 3, 4, 5]
 # trials per dimension
 numtrials = 10
 
