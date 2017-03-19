@@ -65,9 +65,9 @@ for n in ns:
         # end time
         endTime = time.time()
         # add time to average
-        avg = endTime - startTime + avg
+        avg = (endTime - startTime) + avg
     # add average time to list
-    avg_time.append(avg / 10.0)
+    avg_time.append(avg / 10.)
     # show progress
     print ('flag', str(i), 'dimension', str(n) + '*' + str(n), 'complete')
 
