@@ -36,7 +36,7 @@ int **genrand_Matrix(int d) {
 
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
-            m[i][j] = rand() % 3;
+            m[i][j] = rand() % 4;
         }
     }
 
@@ -62,7 +62,7 @@ int **standardmult(int **a, int **b, int **c, int d) {
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
             for (int k = 0; k < d; k++) {
-                c[i][k] += a[i][j] * b[j][k];
+                c[i][k] = c[i][k] + a[i][j] * b[j][k];
             }
         }
     }
@@ -76,17 +76,19 @@ void freeMatrix(int d, int **a) {
     }
 
     free(a);
+    a = NULL;
 }
 
-// Strassen's algorithm
 int **strassen(int **x, int **y, int dim) {
 
     int **z = newMatrix(dim);
-    
-    if (dim <= threshold)
-        return standardmult(x, y, z, dim);
 
-    else {
+    if (dim == 1) {
+        z[0][0] = x[0][0] * y[0][0];
+        return z;
+    }
+
+    else {   
         int half = dim / 2;
 
         int **a = newMatrix(half);
@@ -150,6 +152,19 @@ int **strassen(int **x, int **y, int dim) {
     }
 }
 
+// Strassen's Modified algorithm
+int **strassenMod(int **x, int **y, int d) {
+
+    int **z = newMatrix(d);
+    
+    if (d <= threshold)
+        return standardmult(x, y, z, d);
+
+    else {
+        return strassen(x, y, d);
+    }
+}
+
 // Pad to the nearest power of 2
 int padding(int d) {
 
@@ -159,6 +174,15 @@ int padding(int d) {
         p *= 2;
 
     return p;
+}
+
+void printDiags(int d, int **a) {
+// only print the diagonals, ignore the paddings
+    for (int i = 0; i < d; i++){
+        if (a[i][i] == 0)
+            continue;
+        printf("%d\n", a[i][i]);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -184,6 +208,7 @@ int main(int argc, char *argv[]) {
 
     int **a = newMatrix(dimension);
     int **b = newMatrix(dimension);
+    int **c = newMatrix(dimension);
 
     // Takes care of padding for first matrix
     for (int i = 0; i < dimension; i++){
@@ -209,22 +234,20 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (flag == 1) {
+
+        standardmult(a, b, c, dimension);
+        printDiags(dimension, c);
+    }
+
     if (flag == 2) {
-        int **x = genrand_Matrix(dimension);
-        int **y = genrand_Matrix(dimension);
-
-        
+        c = strassen(a, b, dimension);
+        printDiags(dimension, c);
     }
 
+    c = strassenMod(a, b, dimension);
 
-    int **c = strassen(a, b, dimension);
-
-    // only print the diagonals, ignore the paddings
-    for (int i = 0; i < dimension; i++){
-        if (c[i][i] == 0)
-            continue;
-        printf("%d\n", c[i][i]);
-    }
+    //printDiags(dimension, c);
 
     freeMatrix(dimension, a);
     freeMatrix(dimension, b);
