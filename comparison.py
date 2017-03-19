@@ -14,11 +14,10 @@ import random
 files = ['zeroOne.txt', 'negOnetoOne.txt', 'onetoThree.txt']
 
 # dimensions to test
-ns = [2**x for x in range(0, 12)] + [2**x + 1 for x in range(0, 12)]
+# ns = [2**x for x in range(0, 12)] + [2**x + 1 for x in range(0, 12)]
+ns = [1, 2, 3, 4, 5]
 # trials per dimension
 numtrials = 10
-# average time
-avg_time = []
 
 
 def matrix_generation_zero(d):
@@ -51,15 +50,18 @@ def matrix_generation_two(d):
         file.write("%s\n" % item)
 
 # flag 1
+avg_time = []
 for n in ns:
     # intiialize avg to zero
     avg = 0
     # run each dimension 10 times
-    for time in range(0, 10):
+    for _ in range(0, 10):
+        # create the text file
+        matrix_generation_zero(n)
         # start time
         startTime = time.time()
         # ./programname flag dimension inputfile
-        cmd = ['./main', str(i), files[0]]
+        cmd = ['./main', '1', files[0]]
         # run command
         out, err = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()
         # end time
@@ -69,17 +71,20 @@ for n in ns:
     # add average time to list
     avg_time.append(avg / 10.)
     # show progress
-    print ('flag', str(i), 'dimension', str(n) + '*' + str(n), 'complete')
+    print ('flag 1', 'dimension', str(n) + '*' + str(n), 'complete')
 
-
-np.savetxt('conventional' + '.txt', np.c_[ns, avg_time])
+result = np.column_stack((ns, avg_time))
+np.savetxt('conventional.txt', result)
 
 # flag 2
+avg_time = []
 for n in ns:
     # intiialize avg to zero
     avg = 0
     # run each dimension 10 times
-    for time in range(0, 10):
+    for _ in range(0, 10):
+        # create the text file
+        matrix_generation_zero(n)
         # start time
         startTime = time.time()
         # ./programname flag dimension inputfile
@@ -89,10 +94,10 @@ for n in ns:
         # end time
         endTime = time.time()
         # add time to average
-        avg = endTime - startTime + avg
+        avg = (endTime - startTime) + avg
     # add average time
-    avg_time.append(avg)
+    avg_time.append(avg / 10.)
     # show progress
     print ('flag 2', 'dimension', str(n) + '*' + str(n), 'complete')
 
-np.savetxt('strassen' + '.txt', np.c_[ns, avg_time])
+np.savetxt('strassen.txt', result)
