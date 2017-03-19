@@ -56,7 +56,7 @@ int **add_matrix(int **a, int **b, int d, int neg) {
     return c;
 }
 
-
+// Conventional matrix multiplication
 int **standardmult(int **a, int **b, int **c, int d) {
     //int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
@@ -79,6 +79,7 @@ void freeMatrix(int d, int **a) {
     a = NULL;
 }
 
+// Normal Strassen
 int **strassen(int **x, int **y, int dim) {
 
     int **z = newMatrix(dim);
@@ -176,6 +177,7 @@ int padding(int d) {
     return p;
 }
 
+// Print the diagonals of the matrix
 void printDiags(int d, int **a) {
 // only print the diagonals, ignore the paddings
     for (int i = 0; i < d; i++){
@@ -183,6 +185,8 @@ void printDiags(int d, int **a) {
             continue;
         printf("%d\n", a[i][i]);
     }
+
+    printf("\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -235,7 +239,6 @@ int main(int argc, char *argv[]) {
     }
 
     if (flag == 1) {
-
         standardmult(a, b, c, dimension);
         printDiags(dimension, c);
     }
@@ -247,7 +250,7 @@ int main(int argc, char *argv[]) {
 
     c = strassenMod(a, b, dimension);
 
-    //printDiags(dimension, c);
+    printDiags(dimension, c);
 
     freeMatrix(dimension, a);
     freeMatrix(dimension, b);
