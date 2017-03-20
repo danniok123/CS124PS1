@@ -10,94 +10,57 @@ import numpy as np
 import time
 import random
 
-# files
-files = ['zeroOne.txt', 'negOnetoOne.txt', 'onetoThree.txt']
+# matrix file
+matrixFile = 'comparison_matrix.txt'
 
 # dimensions to test
-ns = [x for x in range(1, 2049)]
-# ns = [1, 2, 3, 4, 5]
+ns = [x for x in xrange(1, 2049)]
 # trials per dimension
 numtrials = 10
+# bounds for matrix value ranges (integer values)
+low = -1
+high = 1
 
 
-def matrix_generation_zero(d):
-    # create file with matrix that has values 0, 1
-    temporaryList = []
-    for _ in range(1, 2 * d**2 + 1):
-        temporaryList.append(random.randint(0, 1))
-    file = open(files[0], 'w')
-    for item in temporaryList:
-        file.write("%s\n" % item)
+# create matrix file
+def matrix_generation(d, l, h):
+    file = open(matrixFile, 'w')
+    for _ in xrange(1, 2 * d**2 + 1):
+        file.write("%s\n" % random.randint(l, h))
+    file.close()
 
 
-def matrix_generation_one(d):
-    # create file with matrix that has values -1, 0, 1
-    temporaryList = []
-    for _ in range(1, 2 * d**2 + 1):
-        temporaryList.append(random.randint(-1, 1))
-    file = open(files[1], 'w')
-    for item in temporaryList:
-        file.write("%s\n" % item)
+# run process
+def test_process(flag):
+    startTime = time.time()
+    # ./programname flag dimension inputfile
+    cmd = ['./main', str(flag), matrixFile]
+    # run command
+    out, err = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()
+    endTime = time.time()
+    timeResult = endTime - startTime
+    return timeResult
 
 
-def matrix_generation_two(d):
-    # create file with matrix that has values 1, 2, 3
-    temporaryList = []
-    for _ in range(1, 2 * d**2 + 1):
-        temporaryList.append(random.randint(1, 3))
-    file = open(files[2], 'w')
-    for item in temporaryList:
-        file.write("%s\n" % item)
-
-# flag 1
-avg_time = []
+# avg time list for each flag
+avg1_time = []
+avg2_time = []
 for n in ns:
-    # intiialize avg to zero
-    avg = 0
-    # run each dimension 10 times
-    for _ in range(0, 10):
+    avg1 = 0
+    avg2 = 0
+    for _ in xrange(0, 10):
         # create the text file
-        matrix_generation_zero(n)
-        # start time
-        startTime = time.time()
-        # ./programname flag dimension inputfile
-        cmd = ['./main', '1', files[0]]
-        # run command
-        out, err = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()
-        # end time
-        endTime = time.time()
-        # add time to average
-        avg = (endTime - startTime) + avg
-    # add average time to list
-    avg_time.append(avg / 10.)
+        matrix_generation(n, low, high)
+        avg1 = test_process(1) + avg1
+        avg2 = test_process(2) + avg2
+    # add average time to each
+    avg1_time.append(avg1 / 10.)
+    avg2_time.append(avg2 / 10.)
     # show progress
-    print ('flag 1', 'dimension', str(n) + '*' + str(n), 'complete')
+    print 'dimension', str(n), 'complete'
 
-result = np.column_stack((ns, avg_time))
-np.savetxt('conventional.txt', result)
-
-# flag 2
-avg_time = []
-for n in ns:
-    # intiialize avg to zero
-    avg = 0
-    # run each dimension 10 times
-    for _ in range(0, 10):
-        # create the text file
-        matrix_generation_zero(n)
-        # start time
-        startTime = time.time()
-        # ./programname flag dimension inputfile
-        cmd = ['./main', '2', files[0]]
-        # run command
-        out, err = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()
-        # end time
-        endTime = time.time()
-        # add time to average
-        avg = (endTime - startTime) + avg
-    # add average time
-    avg_time.append(avg / 10.)
-    # show progress
-    print ('flag 2', 'dimension', str(n) + '*' + str(n), 'complete')
-
-np.savetxt('strassen.txt', result)
+result1 = np.column_stack((ns, avg1_time))
+result2 = np.column_stack((ns, avg2_time))
+np.savetxt('comparison_flag1.txt', result1)
+np.savetxt('comparison_flag2.txt', result2)
+print 'comparison.py is now exiting'
