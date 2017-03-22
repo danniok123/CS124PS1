@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "main.h"
 
-#define threshold 15
+#define threshold 256
 
 
 int **newMatrix(int d) {
@@ -36,7 +36,7 @@ int **genrand_Matrix(int d) {
 
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
-            m[i][j] = rand() % 4;
+            m[i][j] = rand() % 100; // 0 - 99
         }
     }
 
@@ -44,20 +44,27 @@ int **genrand_Matrix(int d) {
 }
 
 // Included in neg so that it's not necessary to create subtraction func
-int **add_matrix(int **a, int **b, int d, int neg) {
-
-    int **c = newMatrix(d);
+int **add_matrix(int **a, int **b, int **c, int d, int neg) {
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
             c[i][j] = a[i][j] + neg * b[i][j];
         }
     }
+    return c;
+}
 
+// Included in neg so that it's not necessary to create subtraction func
+int **add(int **a, int **b, int **c, int d, int neg) {
+    for (int i = 0; i < d; i++) {
+        for (int j = 0; j < d; j++) {
+            c[i][j] = a[i][j] + neg * b[i][j];
+        }
+    }
     return c;
 }
 
 // Conventional matrix multiplication
-int **standardmult(int **a, int **b, int **c, int d) {
+void standardmult(int **a, int **b, int **c, int d) {
     //int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
@@ -66,7 +73,6 @@ int **standardmult(int **a, int **b, int **c, int d) {
             }
         }
     }
-    return c;
 }
 
 // Freeing the matrix
@@ -76,93 +82,102 @@ void freeMatrix(int d, int **a) {
     }
 
     free(a);
-    a = NULL;
 }
 
-// Normal Strassen
-int **strassen(int **x, int **y, int dim) {
+void newZ(int **x, int **z, int d, int n) {
+  for (int i = 0; i< d; i++){
+    for (int j = 0; i< d; i++){
+        if (n == 1)
+            z[i][j] = x[i][j];
+        else if (n == 2)
+            z[i][j + d] = x[i][j];
+        else if (n == 3)
+            z[i + d][j] = x[i][j];
+        else if (n == 4)
+            z[i + d][j + d] = x[i][j];
+    }
+  }
+}
 
-    int **z = newMatrix(dim);
 
-    if (dim == 1) {
+// Strassen's Modified algorithm
+void strassenMod(int **x, int **y, int **z, int dim) {
+    
+    if (dim <= threshold)
+        standardmult(x, y, z, dim);
+
+    else if (dim == 1) {
         z[0][0] = x[0][0] * y[0][0];
-        return z;
     }
 
-    else {   
+    else {
         int half = dim / 2;
+        int **a, **c, **e, **g;
 
-        int **a = newMatrix(half);
+        
         int **b = newMatrix(half);
-        int **c = newMatrix(half);
         int **d = newMatrix(half);
-        int **e = newMatrix(half);
         int **f = newMatrix(half);
-        int **g = newMatrix(half);
         int **h = newMatrix(half);
+
+        int **p1 = newMatrix(half);
+        int **p2 = newMatrix(half);
+        int **p3 = newMatrix(half);
+        int **p4 = newMatrix(half);
+        int **p5 = newMatrix(half);
+        int **p6 = newMatrix(half);
+        int **p7 = newMatrix(half);
+
+        int **tmp1 = newMatrix(half);
+        int **tmp2 = newMatrix(half);
 
         for (int i = 0; i < half; i++) {
             for (int j = 0; j < half; j++) {
-                a[i][j] = x[i][j];
                 b[i][j] = x[i][j + half];
-                c[i][j] = x[i + half][j];
                 d[i][j] = x[i + half][j + half];
-                e[i][j] = y[i][j];
                 f[i][j] = y[i][j + half];
-                g[i][j] = y[i + half][j];
                 h[i][j] = y[i + half][j + half];
             }
         }
 
-        int **p1 = strassen(a, add_matrix(f, h, half, -1), half); // A(F - H)
-        int **p2 = strassen(add_matrix(a, b, half, 1), h, half); // (A + B)H
-        int **p3 = strassen(add_matrix(c, d, half, 1), e, half); // (C + D)H
-        int **p4 = strassen(d, add_matrix(g, e, half, -1), half); // D(G - E)
-        int **p5 = strassen(add_matrix(a, d, half, 1), add_matrix(e, h, half, 1), half); // (A + D)(E + H)
-        int **p6 = strassen(add_matrix(b, d, half, -1), add_matrix(g, h, half, 1), half); // (B - D)(G + H)
-        int **p7 = strassen(add_matrix(a, c, half, -1), add_matrix(e, f, half, 1), half); // (A - C)(E + F)
+        a = x;
+        c = &x[half];
+
+        e = y;
+        g = &y[half];
+
+        strassenMod(a, add_matrix(f, h, tmp1, half, -1), p1, half); // A(F - H)
+        strassenMod(add_matrix(a, b, tmp1, half, 1), h, p2, half); // (A + B)H
+        strassenMod(add_matrix(c, d, tmp1, half, 1), e, p3, half); // (C + D)H
+        strassenMod(d, add_matrix(g, e, tmp1, half, -1), p4, half); // D(G - E)
+        strassenMod(add_matrix(a, d, tmp1, half, 1), add_matrix(e, h, tmp2, half, 1), p5, half); // (A + D)(E + H)
+        strassenMod(add_matrix(b, d, tmp1, half, -1), add_matrix(g, h, tmp2, half, 1), p6, half); // (B - D)(G + H)
+        strassenMod(add_matrix(a, c, tmp1, half, -1), add_matrix(e, f, tmp2, half, 1), p7, half); // (A - C)(E + F)
 
         // AE + BG = P5 + P4 - P2 + P6
-        int **z11 = add_matrix(p5, add_matrix(p4, add_matrix(p6, p2, half, -1), half, 1), half, 1);
-         
+        add_matrix(p5, p4, tmp1, half, 1);
+        add_matrix(tmp1, p2, tmp2, half, -1);
+        add_matrix(tmp2, p6, tmp1, half, 1);
+        newZ(tmp1, z, half, 1);
+
         // AF + BH = P1 + P2
-        int **z12 = add_matrix(p1, p2, half, 1);
-        
-        // CE + DG = P3 + P4
-        int **z21 = add_matrix(p3, p4, half, 1);
+        add_matrix(p1, p2, tmp2, half, 1);
+        newZ(tmp2, z, half, 2);
 
-        // CF + DH = P5 + P1 - P3 - P7
-        int **z22 = add_matrix(add_matrix(p5, p1, half, 1), add_matrix(p3, p7, half, 1), half, -1);
+         // CE + DG = P3 + P4
+        add_matrix(p3, p4, tmp1, half, 1);
+        newZ(tmp1, z, half, 3);
 
-        for (int i = 0; i < half; i++) {
-            for (int j = 0; j < half; j++) {
-                z[i][j] = z11[i][j];
-                z[i][j + half] = z12[i][j];
-                z[i + half][j] = z21[i][j];
-                z[i + half][j + half] = z22[i][j];
-            }
-        }
+        add_matrix(p5, p1, tmp1, half, 1);
+        add_matrix(tmp1, p3, tmp2, half, -1);
+        add_matrix(tmp2, p7, tmp1, half, -1);
+        newZ(tmp1, z, half, 4);
 
-        freeMatrix(half, a); freeMatrix(half, b); freeMatrix(half, c); freeMatrix(half, d);
-        freeMatrix(half, e); freeMatrix(half, f); freeMatrix(half, g); freeMatrix(half, h);
-        freeMatrix(half, p1); freeMatrix(half, p2); freeMatrix(half, p3); freeMatrix(half, p4);
-        freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7); freeMatrix(half, z11);
-        freeMatrix(half, z12); freeMatrix(half, z21); freeMatrix(half, z22);
 
-        return z;
-    }
-}
-
-// Strassen's Modified algorithm
-int **strassenMod(int **x, int **y, int d) {
-
-    int **z = newMatrix(d);
-    
-    if (d <= threshold)
-        return standardmult(x, y, z, d);
-
-    else {
-        return strassen(x, y, d);
+        freeMatrix(half, b); freeMatrix(half, d); freeMatrix(half, f); freeMatrix(half, h);
+        freeMatrix(half, tmp1); freeMatrix(half, tmp2); freeMatrix(half, p1); freeMatrix(half, p2); 
+        freeMatrix(half, p3); freeMatrix(half, p4); freeMatrix(half, p5);  freeMatrix(half, p6);  
+        freeMatrix(half, p7);   
     }
 }
 
@@ -189,6 +204,14 @@ void printDiags(int d, int **a) {
     printf("\n");
 }
 
+
+// testing standard matrix mult on small dimension
+void test1(int **a, int **b, int **c, int d) {
+    //assert(standardmult);
+
+
+}
+
 int main(int argc, char *argv[]) {
 
     // Error Handling
@@ -199,6 +222,7 @@ int main(int argc, char *argv[]) {
 
     int flag = atoi(argv[1]);
     int dimension = atoi(argv[2]);
+    clock_t t1;
 
     int old = dimension;
 
@@ -215,11 +239,13 @@ int main(int argc, char *argv[]) {
     int **c = newMatrix(dimension);
 
     // Takes care of padding for first matrix
-    for (int i = 0; i < dimension; i++){
+    for(int i = 0; i < dimension; i++){
         for(int j = 0; j < dimension; j++){
-            if(i < old && j< old){
+            if (i < old && j< old){
                 fscanf(file, "%d", &a[i][j]);
             }
+
+            // pad the rest with 0's
             else{
                 a[i][j]=0;
             }
@@ -227,34 +253,61 @@ int main(int argc, char *argv[]) {
     }
 
     // Takes care of padding for second matrix
-    for (int i = 0; i < dimension; i++){
-        for(int j =0; j < dimension; j++){
-            if(i < old && j< old){
+    for(int i = 0; i < dimension; i++){
+        for(int j = 0; j < dimension; j++){
+            if (i < old && j< old){
                 fscanf(file, "%d", &b[i][j]);
             }
+
+            // pad the rest with 0's
             else{
                 b[i][j]=0;
             }
         }
     }
 
+    /*for(int i = 0; i < dimension; i++){
+        for(int j = 0; j < dimension; j++){
+            printf("%d\n", a[i][j]);
+        }
+    }*/
+
     if (flag == 1) {
+        a = genrand_Matrix(dimension);
+        b = genrand_Matrix(dimension);
+        t1 = clock();
         standardmult(a, b, c, dimension);
-        printDiags(dimension, c);
+        t1 = clock() - t1;
+        double fib1 = ((double)t1) / CLOCKS_PER_SEC;
+        printf("recfib() took %f seconds \n", fib1);
+        //printDiags(dimension, c);
     }
 
-    if (flag == 2) {
-        c = strassen(a, b, dimension);
-        printDiags(dimension, c);
-    }
+    /*if (flag == 2) {
+        a = genrand_Matrix(dimension);
+        b = genrand_Matrix(dimension);
+        t1 = clock();
+        strassen(a, b, c, dimension);
+        t1 = clock() - t1;
+        double fib1 = ((double)t1) / CLOCKS_PER_SEC;
+        printf("recfib() took %f seconds \n", fib1);
+        //printDiags(dimension, c);
+    }*/
+    
 
-    c = strassenMod(a, b, dimension);
+    t1 = clock();
+    strassenMod(a, b, c, dimension);
+    t1 = clock() - t1;
+    double fib1 = ((double)t1) / CLOCKS_PER_SEC;
+    printf("recfib() took %f seconds \n", fib1);
 
-    printDiags(dimension, c);
+    //printDiags(dimension, c);
 
     freeMatrix(dimension, a);
     freeMatrix(dimension, b);
     freeMatrix(dimension, c);
+
+    fclose(file);
 
     return 0;
 }
