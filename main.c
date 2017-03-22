@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "main.h"
 
-#define threshold 256
+#define threshold 83
 
 
 int **newMatrix(int d) {
@@ -69,7 +69,7 @@ void standardmult(int **a, int **b, int **c, int d) {
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
             for (int k = 0; k < d; k++) {
-                c[i][k] = c[i][k] + a[i][j] * b[j][k];
+                c[i][k] += a[i][j] * b[j][k];
             }
         }
     }
@@ -181,6 +181,80 @@ void strassenMod(int **x, int **y, int **z, int dim) {
     }
 }
 
+
+/*// Strassen's Regular algorithm
+void strassen(int x[][dim], int y[][dim], int z[][dim], int dim) {
+    
+    if (dim == 1) {
+        z[0][0] = x[0][0] * y[0][0];
+    }
+
+    else {
+        int half = dim / 2;
+        int a[half][half], c[half][half], e[half][half], g[half][half];
+
+        
+        int b[half][half];
+        int d[half][half];
+        int f[half][half];
+        int h[half][half];
+
+        int p1[half][half];
+        int p2[half][half];
+        int p3[half][half];
+        int p4[half][half];
+        int p5[half][half];
+        int p6[half][half];
+        int p7[half][half];
+
+        int tmp1[half][half];
+        int tmp2[half][half];
+
+        for (int i = 0; i < half; i++) {
+            for (int j = 0; j < half; j++) {
+                b[i][j] = x[i][j + half];
+                d[i][j] = x[i + half][j + half];
+                f[i][j] = y[i][j + half];
+                h[i][j] = y[i + half][j + half];
+            }
+        }
+
+        a = x;
+        c = &x[half];
+
+        e = y;
+        g = &y[half];
+
+        strassen(a, add_matrix2(f, h, tmp1, half, -1), p1, half); // A(F - H)
+        strassen(add_matrix2(a, b, tmp1, half, 1), h, p2, half); // (A + B)H
+        strassen(add_matrix2(c, d, tmp1, half, 1), e, p3, half); // (C + D)H
+        strassen(d, add_matrix2(g, e, tmp1, half, -1), p4, half); // D(G - E)
+        strassen(add_matrix2(a, d, tmp1, half, 1), add_matrix2(e, h, tmp2, half, 1), p5, half); // (A + D)(E + H)
+        strassen(add_matrix2(b, d, tmp1, half, -1), add_matrix2(g, h, tmp2, half, 1), p6, half); // (B - D)(G + H)
+        strassen(add_matrix2(a, c, tmp1, half, -1), add_matrix2(e, f, tmp2, half, 1), p7, half); // (A - C)(E + F)
+
+        // AE + BG = P5 + P4 - P2 + P6
+        add_matrix2(p5, p4, tmp1, half, 1);
+        add_matrix2(tmp1, p2, tmp2, half, -1);
+        add_matrix2(tmp2, p6, tmp1, half, 1);
+        newZ2(tmp1, z, half, 1);
+
+        // AF + BH = P1 + P2
+        add_matrix2(p1, p2, tmp2, half, 1);
+        newZ2(tmp2, z, half, 2);
+
+         // CE + DG = P3 + P4
+        add_matrix2(p3, p4, tmp1, half, 1);
+        newZ2(tmp1, z, half, 3);
+
+        add_matrix2(p5, p1, tmp1, half, 1);
+        add_matrix2(tmp1, p3, tmp2, half, -1);
+        add_matrix2(tmp2, p7, tmp1, half, -1);
+        newZ2(tmp1, z, half, 4);
+
+    }
+}*/
+
 // Pad to the nearest power of 2
 int padding(int d) {
 
@@ -273,8 +347,8 @@ int main(int argc, char *argv[]) {
     }*/
 
     if (flag == 1) {
-        a = genrand_Matrix(dimension);
-        b = genrand_Matrix(dimension);
+        //a = genrand_Matrix(dimension);
+        //b = genrand_Matrix(dimension);
         t1 = clock();
         standardmult(a, b, c, dimension);
         t1 = clock() - t1;
