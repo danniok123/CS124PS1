@@ -15,11 +15,11 @@ matrixFile = 'comparison_matrix.txt'
 
 # dimensions to test
 ns = [x for x in xrange(1, 2049)]
-# trials per dimension
-numtrials = 10
 # bounds for matrix value ranges (integer values)
 low = -1
 high = 1
+# number of trials per dimension
+trials = 5
 
 
 # create matrix file
@@ -48,14 +48,14 @@ avg2_time = []
 for n in ns:
     avg1 = 0
     avg2 = 0
-    for _ in xrange(0, 10):
+    for _ in xrange(0, trials):
         # create the text file
         matrix_generation(n, low, high)
         avg1 = test_process(1) + avg1
         avg2 = test_process(2) + avg2
     # add average time to each
-    avg1_time.append(avg1 / 10.)
-    avg2_time.append(avg2 / 10.)
+    avg1_time.append(avg1 / 5.)
+    avg2_time.append(avg2 / 5.)
     # show progress
     print 'dimension', str(n), 'complete'
 
