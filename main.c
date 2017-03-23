@@ -10,8 +10,9 @@
 #include <unistd.h>
 
 //#define threshold 83
+int timeTaken(int t, int d, int **a, int **b, int **c);
 
-
+// Allocating a new matrix
 int **newMatrix(int d) {
     int **m = (int**) malloc(d * sizeof(int*));
 
@@ -35,16 +36,16 @@ int **genrand_Matrix(int d) {
 
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
-            m[i][j] = rand() % 4;
+            m[i][j] = rand() % 50;
         }
     }
 
     return m;
 }
 
+
 // Included in neg so that it's not necessary to create subtraction func
 int **add_matrix(int **a, int **b, int d, int neg) {
-
     int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
@@ -56,8 +57,8 @@ int **add_matrix(int **a, int **b, int d, int neg) {
 }
 
 
+// Conventional matrix multiplication
 int **standardmult(int **a, int **b, int **c, int d) {
-    //int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
             for (int k = 0; k < d; k++) {
@@ -75,9 +76,8 @@ void freeMatrix(int d, int **a) {
     }
 
     free(a);
-    a = NULL;
+   // a = NULL;
 }
-
 
 // Strassen's Modified algorithm
 int **strassenMod(int **x, int **y, int **z, int d, int t) {
@@ -87,7 +87,6 @@ int **strassenMod(int **x, int **y, int **z, int d, int t) {
 
     if (d == 1) {
         z[0][0] = x[0][0] * y[0][0];
-        return z;
     }
 
     else {   
@@ -128,49 +127,31 @@ int **strassenMod(int **x, int **y, int **z, int d, int t) {
         strassenMod(d, add_matrix(g, e, half, -1), p4, half, t); // D(G - E)
         strassenMod(add_matrix(a, d, half, 1), add_matrix(e, h, half, 1), p5, half, t); // (A + D)(E + H)
         strassenMod(add_matrix(b, d, half, -1), add_matrix(g, h, half, 1), p6, half, t); // (B - D)(G + H)
-        strassenMod(add_matrix(a, c, half, -1), add_matrix(e, f, half, 1), p7, half, t); // (A - C)(E + F)
+        strassenMod(add_matrix(a, c, half, -1), add_matrix(e, f, half, 1), p7, half, t); // (A - C)(E + F
 
-        // AE + BG = P5 + P4 - P2 + P6
-        int **z11 = add_matrix(p5, add_matrix(p4, add_matrix(p6, p2, half, -1), half, 1), half, 1);
-         
-        // AF + BH = P1 + P2
-        int **z12 = add_matrix(p1, p2, half, 1);
         
-        // CE + DG = P3 + P4
-        int **z21 = add_matrix(p3, p4, half, 1);
-
-        // CF + DH = P5 + P1 - P3 - P7
-        int **z22 = add_matrix(add_matrix(p5, p1, half, 1), add_matrix(p3, p7, half, 1), half, -1);
-
         for (int i = 0; i < half; i++) {
             for (int j = 0; j < half; j++) {
-                z[i][j] = z11[i][j];
-                z[i][j + half] = z12[i][j];
-                z[i + half][j] = z21[i][j];
-                z[i + half][j + half] = z22[i][j];
+                // AE + BG = P5 + P4 - P2 + P6
+                z[i][j] = p5[i][j] + p4[i][j] - p2[i][j] + p6[i][j]; 
+                // AF + BH = P1 + P2
+                z[i][j + half] = p1[i][j] + p2[i][j];
+                // CE + DG = P3 + P4 
+                z[i + half][j] = p3[i][j] + p4[i][j]; 
+                // CF + DH = P5 + P1 - P3 - P7
+                z[i + half][j + half] = p5[i][j] + p1[i][j] - p3[i][j] - p7[i][j]; 
             }
         }
 
         freeMatrix(half, b); freeMatrix(half, d); freeMatrix(half, f); freeMatrix(half, h);
         freeMatrix(half, p1); freeMatrix(half, p2); freeMatrix(half, p3); freeMatrix(half, p4);
-        freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7); freeMatrix(half, z11);
-        freeMatrix(half, z12); freeMatrix(half, z21); freeMatrix(half, z22);
+        freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7); 
 
         return z;
     }
 }
 
-// Pad to the nearest power of 2
-/*int padding(int d) {
-
-    int p = 1;
-
-    while(p < d)
-        p *= 2;
-
-    return p;
-}*/
-
+// Padding 
 int padding(int d, int t) {
     int tmp = d;
     while (tmp > t) {
@@ -187,11 +168,31 @@ int padding(int d, int t) {
 void printDiags(int d, int **a) {
 // only print the diagonals, ignore the paddings
     for (int i = 0; i < d; i++){
-        if (a[i][i] == 0)
-            continue;
         printf("%d\n", a[i][i]);
     }
 }
+
+void testing(int d, int **x) {
+    //assert(padding(7) == )
+}
+
+/*
+void timeTaken2(int d, int **a, int **b, int **c) {
+    for (int i = 0; i < d; i++) {
+        for (int j = 1; j < d + 1; j++) {
+            int times = timeTaken(j, d, a, b, c);
+        }
+    }
+    printf("%d\n", times);
+}
+
+int timeTaken(int t, int d, int **a, int **b, int **c) {
+    time_t start = time(NULL);
+    strassenMod(a, b, c, d, t);
+    time_t end = time(NULL);
+
+    return end - start;
+}*/
 
 int main(int argc, char *argv[]) {
 
@@ -203,7 +204,7 @@ int main(int argc, char *argv[]) {
 
     int flag = atoi(argv[1]);
     int dimension = atoi(argv[2]);
-    int threshold = atoi(argv[4]);
+    int t = atoi(argv[4]);
 
     clock_t t1;
 
@@ -214,7 +215,7 @@ int main(int argc, char *argv[]) {
     file = fopen(argv[3], "r");
 
     if (dimension > 2) {
-        dimension = padding(dimension , threshold);
+        dimension = padding(dimension, t);
     }
 
     int **a = newMatrix(dimension);
@@ -245,18 +246,25 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    a = genrand_Matrix(dimension);
-    b = genrand_Matrix(dimension);
+    if (flag == 1) {
+        testing(dimension, a);
+    }
 
+   // a = genrand_Matrix(dimension);
+    //b = genrand_Matrix(dimension);
+
+
+
+    
     t1 = clock();
-    strassenMod(a, b, c, dimension, threshold);
+    c = strassenMod(a, b, c, dimension, t);
     t1 = clock() - t1;
     double secs = ((double)t1) / CLOCKS_PER_SEC;
     printf("strassenMod() took %f seconds \n", secs);
 
-    //padding(1053, threshold);
+    //printf("%d", padding(7, threshold));
 
-    //printDiags(dimension, c);
+    printDiags(old, c);
 
     freeMatrix(dimension, a);
     freeMatrix(dimension, b);
