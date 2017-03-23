@@ -85,8 +85,9 @@ int **strassenMod(int **x, int **y, int **z, int d, int t) {
     if (d <= t)
         return standardmult(x, y, z, d);
 
-    if (d == 1) {
+    else if (d == 1) {
         z[0][0] = x[0][0] * y[0][0];
+        return z;
     }
 
     else {   
