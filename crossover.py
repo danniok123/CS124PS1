@@ -15,8 +15,6 @@ ns = [x for x in xrange(1, 1025)]
 # bounds for matrix value ranges (integer values)
 low = -1
 high = 1
-# number of trials per dimension
-trials = 5
 
 
 # create matrix file
@@ -53,4 +51,4 @@ for n in ns:
     best_c.append(runtime.index(min(runtime)))
 result = np.column_stack((ns, best_c))
 np.savetxt('crossover.txt', result)
-print 'crossover.py is now exiting'
+print 'crossover.py is done running'
