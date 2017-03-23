@@ -14,7 +14,7 @@ import random
 matrixFile = 'comparison_matrix.txt'
 
 # dimensions to test
-ns = [x for x in xrange(1, 2049)]
+ns = [x for x in xrange(1, 1025)]
 # bounds for matrix value ranges (integer values)
 low = -1
 high = 1
