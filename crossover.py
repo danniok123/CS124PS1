@@ -8,7 +8,7 @@ import time
 import random
 
 # matrix file
-matrixFile = 'crossover_matrix.txt'
+matrixFile = 'cod_testfile2.txt'
 
 # dimensions to test
 ns = [x for x in xrange(1, 1025)]
