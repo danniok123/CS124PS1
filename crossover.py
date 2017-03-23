@@ -39,6 +39,7 @@ def test_process(flag, d, c):
 
 # calculate which crossover point results in fastest algo runtime
 best_c = []
+best_time = []
 for n in ns:
     # store runtime of algorithm w/ each crossover point
     runtime = []
@@ -52,6 +53,7 @@ for n in ns:
         for i in xrange(1, 501):
             runtime.append(test_process(0, n, i))
     # store optimal crossover point for that dimension
+    best_time.append(min(runtime))
     best_c.append(runtime.index(min(runtime)) + 1)
     print str(n), 'complete'
 result = np.column_stack((ns, best_c))
