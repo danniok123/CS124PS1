@@ -8,7 +8,7 @@ import time
 import random
 
 # matrix file
-matrixFile = 'crossover_matrix.txt'
+matrixFile = 'r_crossover_matrix.txt'
 
 # dimensions to test
 ns = [x for x in xrange(1, 1025)]
@@ -45,11 +45,11 @@ for n in ns:
     # generate matrix
     matrix_generation(n, low, high)
     # calculate strassen variant runtime for each crossover point value
-    for i in xrange(1, n + 1):
+    for i in xrange(1, n + 1, 5):
         runtime.append(test_process(0, n, i))
     # store optimal crossover point for that dimension
     best_c.append(runtime.index(min(runtime)) + 1)
     print str(n), 'complete'
 result = np.column_stack((ns, best_c))
-np.savetxt('crossover.txt', result.astype(int), fmt='%i')
-print 'crossover.py is done running'
+np.savetxt('r_crossover.txt', result.astype(int), fmt='%i')
+print 'r_crossover.py is done running'
