@@ -11,7 +11,7 @@ import random
 matrixFile = 'r_crossover_matrix.txt'
 
 # dimensions to test
-ns = [x for x in xrange(1, 51)]
+ns = [x for x in xrange(1, 257)]
 # bounds for matrix value ranges (integer values)
 low = -1
 high = 1

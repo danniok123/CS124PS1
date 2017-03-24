@@ -85,7 +85,7 @@ int **strassenMod(int **x, int **y, int **z, int d, int t) {
     if (d <= t)
         return standardmult(x, y, z, d);
 
-    if (d == 1) {
+    else if (d == 1) {
         z[0][0] = x[0][0] * y[0][0];
         return z;
     }
@@ -152,19 +152,6 @@ int **strassenMod(int **x, int **y, int **z, int d, int t) {
     }
 }
 
-/*
-int padding(int d) {
-
-    int p = 1;
-
-    while(p < d)
-        p *= 2;
-
-    return p;
-}*/
-
-
-
 // Padding 
 int padding(int d, int t) {
     int tmp = d;
@@ -177,6 +164,19 @@ int padding(int d, int t) {
     }
 
     return tmp;
+}
+
+int min(int size, float a[]){
+    float minimum = a[0];
+ 
+    for (int c = 1 ; c < size ; c++ ) 
+    {
+        if ( a[c] < minimum ) 
+        {
+           minimum = a[c];
+        }
+    } 
+    return minimum;
 }
 
 void printDiags(int d, int **a) {
@@ -228,61 +228,91 @@ int main(int argc, char *argv[]) {
 
     file = fopen(argv[3], "r");
 
-    if (dimension > 2) {
-        dimension = padding(dimension, t);
-    }
+    float d[t];
 
-    int **a = newMatrix(dimension);
-    int **b = newMatrix(dimension);
-    int **c = newMatrix(dimension);
+    for (int i = 1; i <= t; i++) {
+        if (dimension > 2) {
+            dimension = padding(dimension, i);
+        }
 
-    // Takes care of padding for first matrix
-    for (int i = 0; i < dimension; i++){
-        for(int j = 0; j < dimension; j++){
-            if(i < old && j< old){
-                fscanf(file, "%d", &a[i][j]);
-            }
-            else{
-                a[i][j]=0;
+        int **a = newMatrix(dimension);
+        int **b = newMatrix(dimension);
+        int **c = newMatrix(dimension);
+
+        
+
+        // Takes care of padding for first matrix
+        for (int i = 0; i < dimension; i++){
+            for(int j = 0; j < dimension; j++){
+                if(i < old && j< old){
+                    fscanf(file, "%d", &a[i][j]);
+                }
+                else{
+                    a[i][j]=0;
+                }
             }
         }
-    }
 
-    // Takes care of padding for second matrix
-    for (int i = 0; i < dimension; i++){
-        for(int j =0; j < dimension; j++){
-            if(i < old && j< old){
-                fscanf(file, "%d", &b[i][j]);
-            }
-            else{
-                b[i][j]=0;
+        // Takes care of padding for second matrix
+        for (int i = 0; i < dimension; i++){
+            for(int j =0; j < dimension; j++){
+                if(i < old && j< old){
+                    fscanf(file, "%d", &b[i][j]);
+                }
+                else{
+                    b[i][j]=0;
+                }
             }
         }
-    }
 
-    if (flag == 1) {
-        testing(dimension, a);
-    }
+        t1 = clock();
+        for (int j = 0; j < 5; j++) {
+            c = strassenMod(a, b, c, dimension, i);
+        }
+        t1 = clock() - t1;
+        double secs = ((double)t1) / CLOCKS_PER_SEC;
 
+        double tmp2 = secs / 10;
+        //printf("strassenMod() took %f seconds \n", secs);
+
+        d[i] = tmp2;
+
+        //printf("strassenMod() took %f seconds with index %d \n", d[i], i - 1);
+
+        //printDiags(old, c);
+        
+        freeMatrix(dimension, a);
+        freeMatrix(dimension, b);
+        freeMatrix(dimension, c);
+    }
+    //printf("%f", min(t, d));
+    int location = 1;
+
+    float minimum = d[0];
+ 
+        for (int x = 1 ; x < t ; x++ ) {
+            if (d[x] < minimum ) {
+                minimum = d[x];
+                location = x+1;
+            }  
+        } 
+ 
+    //printf("Minimum element is present at location %d and it's value is %f.\n", location, minimum);
    // a = genrand_Matrix(dimension);
     //b = genrand_Matrix(dimension);
 
+    return location;
 
 
-    
+    /*
     t1 = clock();
     c = strassenMod(a, b, c, dimension, t);
     t1 = clock() - t1;
     double secs = ((double)t1) / CLOCKS_PER_SEC;
-    printf("strassenMod() took %f seconds \n", secs);
+    printf("strassenMod() took %f seconds \n", secs);*/
 
     //printf("%d", padding(7, threshold));
 
-    printDiags(old, c);
+    //printDiags(old, c);
 
-    freeMatrix(dimension, a);
-    freeMatrix(dimension, b);
-    freeMatrix(dimension, c);
-
-    return 0;
 }
