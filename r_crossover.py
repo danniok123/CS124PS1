@@ -63,7 +63,7 @@ for n in ns:
     # fastest runtime
     best_t.append(min(runtime))
     # optimal crossover point
-    best_c.append(runtime.index(min(runtime)) + 1)
+    best_c.append(runtime.index(min(runtime)) * 5 + 1)
     print str(n), 'complete'
 result = np.column_stack((ns, best_c))
 np.savetxt('r_crossover.txt', np.c_[result.astype(int), best_t])
