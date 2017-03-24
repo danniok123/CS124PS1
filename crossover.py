@@ -15,6 +15,8 @@ ns = [x for x in xrange(1, 1025)]
 # bounds for matrix value ranges (integer values)
 low = -1
 high = 1
+# number of trials
+trials = 5
 
 
 # create matrix file
@@ -39,23 +41,29 @@ def test_process(flag, d, c):
 
 # calculate which crossover point results in fastest algo runtime
 best_c = []
-best_time = []
+best_t = []
 for n in ns:
     # store runtime of algorithm w/ each crossover point
     runtime = []
     # generate matrix
     matrix_generation(n, low, high)
     # calculate strassen variant runtime for each crossover point value
-    if n < 500:
+    if n < 100:
         for i in xrange(1, n + 1):
-            runtime.append(test_process(0, n, i))
+            temp = 0
+            for _ in range(0, trials):
+                test_process(0, n, i)
+            runtime.append(temp / float(trials))
     else:
-        for i in xrange(1, 501):
-            runtime.append(test_process(0, n, i))
+        for i in xrange(1, 101):
+            temp = 0
+            for _ in range(0, trials):
+                temp += test_process(0, n, i)
+            runtime.append(temp / float(trials))
     # store optimal crossover point for that dimension
-    best_time.append(min(runtime))
+    best_t.append(min(runtime))
     best_c.append(runtime.index(min(runtime)) + 1)
     print str(n), 'complete'
 result = np.column_stack((ns, best_c))
-np.savetxt('crossover.txt', result.astype(int), fmt='%i')
+np.savetxt('crossover.txt', np.c_[result.astype(int), best_t], fmt='%i')
 print 'crossover.py is done running'
