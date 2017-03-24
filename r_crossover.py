@@ -11,7 +11,7 @@ import random
 matrixFile = 'r_crossover_matrix.txt'
 
 # dimensions to test
-ns = [x for x in xrange(1, 1025)]
+ns = [x for x in xrange(1, 11)]
 # bounds for matrix value ranges (integer values)
 low = -1
 high = 1
@@ -30,7 +30,7 @@ def matrix_generation(d, l, h):
 # run process
 def test_process(flag, d, c):
     startTime = time.time()
-    # ./programname flag dimension inputfile crossover_value
+    # ./program_name flag dimension inputfile crossover_value
     cmd = ['./main', str(flag), str(d), matrixFile, str(c)]
     # run command
     out, err = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()
@@ -50,16 +50,16 @@ for n in ns:
     # calculate strassen variant runtime for each crossover point value
     if n < 100:
         for i in xrange(1, n + 1, 5):
-            temp = 0
+            totalTime = 0
             for _ in range(0, trials):
-                temp += test_process(0, n, i)
-            runtime.append(temp / float(trials))
+                totalTime += test_process(0, n, i)
+            runtime.append(totalTime / float(trials))
     else:
         for i in xrange(1, 101, 5):
-            temp = 0
+            totalTime = 0
             for _ in range(0, trials):
-                temp += test_process(0, n, i)
-            runtime.append(temp / float(trials))
+                totalTime += test_process(0, n, i)
+            runtime.append(totalTime / float(trials))
     # fastest runtime
     best_t.append(min(runtime))
     # optimal crossover point
