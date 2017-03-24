@@ -11,7 +11,7 @@ import random
 matrixFile = 'r_crossover_matrix.txt'
 
 # dimensions to test
-ns = [x for x in xrange(1, 11)]
+ns = [x for x in xrange(1, 51)]
 # bounds for matrix value ranges (integer values)
 low = -1
 high = 1
@@ -65,6 +65,6 @@ for n in ns:
     # optimal crossover point
     best_c.append(runtime.index(min(runtime)) * 5 + 1)
     print str(n), 'complete'
-result = np.column_stack((ns, best_c))
-np.savetxt('r_crossover.txt', np.c_[result.astype(int), best_t])
+result = np.column_stack((ns, best_c, best_t))
+np.savetxt('r_crossover.txt', result)
 print 'r_crossover.py is done running'
