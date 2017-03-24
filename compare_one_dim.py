@@ -10,12 +10,12 @@ import time
 import random
 
 # use this to change what dimension is being timed
-dimension = 1024
+dimension = 300
 
 
 def matrix_generation(d):
     print 'file generation started'
-    file = open('cod_testfile2.txt', 'w')
+    file = open('cod_testfile3.txt', 'w')
     startTime = time.time()
     # create file with matrix that has values -1, 0, 1
     for i in range(1, 2 * d**2 + 1):
