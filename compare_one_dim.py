@@ -10,7 +10,7 @@ import time
 import random
 
 # use this to change what dimension is being timed
-dimension = 128
+dimension = 1000
 
 
 def matrix_generation(d):
