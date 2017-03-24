@@ -272,47 +272,38 @@ int main(int argc, char *argv[]) {
         t1 = clock() - t1;
         double secs = ((double)t1) / CLOCKS_PER_SEC;
 
-        double tmp2 = secs / 10;
+        double tmp2 = secs / 5;
         //printf("strassenMod() took %f seconds \n", secs);
 
         d[i] = tmp2;
 
-        //printf("strassenMod() took %f seconds with index %d \n", d[i], i - 1);
+
+
+        printf("strassenMod() took %f seconds with index %d \n", d[i], i);
 
         //printDiags(old, c);
         
         freeMatrix(dimension, a);
         freeMatrix(dimension, b);
         freeMatrix(dimension, c);
+
     }
+
     //printf("%f", min(t, d));
     int location = 1;
 
-    float minimum = d[0];
+    float minimum = d[1];
  
-        for (int x = 1 ; x < t ; x++ ) {
+        for (int x = 2 ; x < t ; x++ ) {
             if (d[x] < minimum ) {
                 minimum = d[x];
                 location = x+1;
             }  
         } 
  
-    //printf("Minimum element is present at location %d and it's value is %f.\n", location, minimum);
-   // a = genrand_Matrix(dimension);
-    //b = genrand_Matrix(dimension);
-
+    printf("Minimum element is present at location %d and it's value is %f.\n", location, minimum);
+   
     return location;
 
-
-    /*
-    t1 = clock();
-    c = strassenMod(a, b, c, dimension, t);
-    t1 = clock() - t1;
-    double secs = ((double)t1) / CLOCKS_PER_SEC;
-    printf("strassenMod() took %f seconds \n", secs);*/
-
-    //printf("%d", padding(7, threshold));
-
-    //printDiags(old, c);
 
 }
