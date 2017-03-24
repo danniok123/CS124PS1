@@ -53,13 +53,13 @@ for n in ns:
             temp = 0
             for _ in range(0, trials):
                 temp += test_process(0, n, i)
-            runtime.append(temp / 5.)
+            runtime.append(temp / float(trials))
     else:
         for i in xrange(1, 101, 5):
             temp = 0
             for _ in range(0, trials):
                 temp += test_process(0, n, i)
-            runtime.append(temp / 5.)
+            runtime.append(temp / float(trials))
     # fastest runtime
     best_t.append(min(runtime))
     # optimal crossover point
