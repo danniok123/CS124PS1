@@ -52,18 +52,18 @@ for n in ns:
         for i in xrange(1, n + 1):
             temp = 0
             for _ in range(0, trials):
-                test_process(0, n, i)
+                temp = temp + test_process(0, n, i)
             runtime.append(temp / float(trials))
     else:
         for i in xrange(1, 101):
             temp = 0
             for _ in range(0, trials):
-                temp += test_process(0, n, i)
+                temp = temp + test_process(0, n, i)
             runtime.append(temp / float(trials))
     # store optimal crossover point for that dimension
     best_t.append(min(runtime))
     best_c.append(runtime.index(min(runtime)) + 1)
     print str(n), 'complete'
 result = np.column_stack((ns, best_c))
-np.savetxt('crossover.txt', np.c_[result.astype(int), best_t], fmt='%i')
+np.savetxt('crossover.txt', np.c_[result.astype(int), best_t])
 print 'crossover.py is done running'

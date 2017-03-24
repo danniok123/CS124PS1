@@ -66,5 +66,5 @@ for n in ns:
     best_c.append(runtime.index(min(runtime)) + 1)
     print str(n), 'complete'
 result = np.column_stack((ns, best_c))
-np.savetxt('r_crossover.txt', np.c_[result.astype(int), best_t], fmt='%i')
+np.savetxt('r_crossover.txt', np.c_[result.astype(int), best_t])
 print 'r_crossover.py is done running'
