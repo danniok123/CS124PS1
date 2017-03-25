@@ -199,10 +199,13 @@ int main(int argc, char *argv[]) {
 
     int avgTrial = 0;
     float avgSecs = 0.0;
-    int numtrials = 1;
+    int numtrials = 20;
+    int iterator = 5;
 
     for (int p = 0; p < numtrials; p++) {
+        printf("hehe\n");
         for (int k = 1; k <= t; k++) {
+
             if (dimension > 2) {
                 dimension = padding(dimension, k);
             }
@@ -236,11 +239,14 @@ int main(int argc, char *argv[]) {
             }
 
             t1 = clock();
-            c = strassenMod(a, b, c, dimension, k);
+            for (int wow = 0; wow < iterator; wow++)
+                c = strassenMod(a, b, c, dimension, k);
             t1 = clock() - t1;
             double secs = ((double)t1) / CLOCKS_PER_SEC;
 
-            d[k] = secs;
+            double tmp2 = secs / iterator;
+
+            d[k] = tmp2;
 
             printf("%f, %d \n", d[k], k);
 
@@ -262,12 +268,14 @@ int main(int argc, char *argv[]) {
             for (int x = 2 ; x <= t ; x++ ) {
                 if (d[x] < minimum ) {
                     minimum = d[x];
-                    location = x+1;
+                    location = x;
                 }  
             }
 
         avgSecs += minimum;
         avgTrial += location;
+
+        //printf("coolio %d\n", avgTrial);
     }
     printf("trial: %d, seconds: %f \n", avgTrial / numtrials, avgSecs / numtrials);
 
