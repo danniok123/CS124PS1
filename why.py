@@ -1,5 +1,4 @@
 # Plot runtimes
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,8 +11,6 @@ name2 = int(name[0])
 
 secs = txt[16:len(txt) - 1, 1]
 crossovers = txt[16:len(txt) - 1, 2]
-
-
 
 xbest = [txt[100, 0]]
 ybest = [txt[100, 1]]

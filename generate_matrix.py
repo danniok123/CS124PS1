@@ -2,10 +2,10 @@
 # Authors: 20907541, 30939506
 # Due: 3/24/2017 at 5 pm
 
-# file
-matrixFile = 'generated_matrix.txt'
 # dimension
-DIM = 5
+DIM = 285
+# file
+matrixFile = 'generated_matrix' + str(DIM) + '.txt'
 
 
 # create matrix file
