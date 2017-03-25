@@ -9,7 +9,7 @@
 #include <limits.h>
 #include <unistd.h>
 
-#define threshold 95
+#define threshold 90
 
 
 int **newMatrix(int d) {
@@ -238,7 +238,6 @@ int padding(int d) {
 }
 
 void printDiags(int d, int **a) {
-// only print the diagonals, ignore the paddings
     for (int i = 0; i < d; i++){
         printf("%d\n", a[i][i]);
     }
@@ -295,34 +294,31 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (flag == 1) {
+        t1 = clock();
+        for (int x = 0; x < 10; x++) {
+            c = strassenMod(a, b, c, dimension);
+        }
+        t1 = clock() - t1;
+        double secs = ((double)t1) / CLOCKS_PER_SEC;
+        double time1 = secs / 10;
+        printf("strassenMod() took an average of %f seconds \n", time1);
+    }
+
     if (flag == 2) {
-        a = genrand_Matrix(dimension);
-        b = genrand_Matrix(dimension);
+        t2 = clock();
+        for (int x = 0; x < 10; x++) {
+            c = standardmult(a, b, c, old);
+        }
+        t2 = clock() - t2;
+        double secs2 = ((double)t2) / CLOCKS_PER_SEC;
+        double time2 = secs2 / 10;
+        printf("standardmult() took an average of %f seconds \n", time2);
     }
-
-
-    t1 = clock();
-    for (int x = 0; x < 10; x++) {
-        c = strassenMod(a, b, c, dimension);
-    }
-    t1 = clock() - t1;
-    double secs = ((double)t1) / CLOCKS_PER_SEC;
-    double time1 = secs / 10;
-
-    printf("strassenMod() took %f seconds \n", time1);
     
-    t2 = clock();
-    for (int x = 0; x < 10; x++) {
-        c = standardmult(a, b, c, old);
-    }
-    t2 = clock() - t2;
-    double secs2 = ((double)t2) / CLOCKS_PER_SEC;
-    double time2 = secs2 / 10;
+    c = strassenMod(a, b, c, dimension);
 
-    printf("standardmult() took %f seconds \n", time2);
-    
-
-    //printDiags(old, c);
+    printDiags(old, c);
 
     freeMatrix(dimension, a);
     freeMatrix(dimension, b);
