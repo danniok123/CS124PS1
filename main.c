@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
 
     file = fopen(argv[3], "r");
 
-    float d[t];
+    float d[t + 1];
 
 
     int avgTrial = 0;
@@ -246,8 +246,9 @@ int main(int argc, char *argv[]) {
 
             //printf("strassenMod() took %f seconds \n", secs);
             
-
-            printDiags(old, c);
+            /*printf("wow %f, \n", d[0]);
+            printf("wow %f, \n", d[1]);
+            printDiags(old, c);*/
 
             freeMatrix(dimension, a);
             freeMatrix(dimension, b);
@@ -255,9 +256,10 @@ int main(int argc, char *argv[]) {
         }
         int location = 1;
 
+
         float minimum = d[1];
      
-            for (int x = 2 ; x < t ; x++ ) {
+            for (int x = 2 ; x <= t ; x++ ) {
                 if (d[x] < minimum ) {
                     minimum = d[x];
                     location = x+1;
