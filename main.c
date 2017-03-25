@@ -91,6 +91,7 @@ int **strassenMod(int **x, int **y, int **z, int dim, int k) {
     }
 
     else {
+
         int half = dim / 2;
 
         int **a, **c, **e, **g;
@@ -199,7 +200,7 @@ int main(int argc, char *argv[]) {
 
     int avgTrial = 0;
     float avgSecs = 0.0;
-    int numtrials = 2;
+    int numtrials = 1;
     int iterator = 1;
 
     for (int p = 0; p < numtrials; p++) {
@@ -248,7 +249,7 @@ int main(int argc, char *argv[]) {
 
             d[k] = tmp2;
 
-            printf("%f, %d \n", d[k], k);
+            printf("%d, %f, %d \n", old, d[k], k);
 
             //printf("strassenMod() took %f seconds \n", secs);
             
@@ -277,7 +278,7 @@ int main(int argc, char *argv[]) {
 
         //printf("coolio %d\n", avgTrial);
     }
-    printf("trial: %d, seconds: %f \n", avgTrial / numtrials, avgSecs / numtrials);
+    printf("%d, %f, %d \n", avgTrial / numtrials, avgSecs / numtrials, 0);
 
 
     return 0;

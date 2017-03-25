@@ -11,8 +11,11 @@ yvals = [0.187280, 0.050532, 0.049654, 0.017836, 0.017322, 0.016934, 0.016927, 0
 xbest = [45]
 ybest = [0.004625]
 
+
+print xbest
 plt.plot(xvals, yvals)
 plt.plot(xbest, ybest, 'ro')
+
 plt.text(35, 0.0013, 'Avg Crossover (43, 0.001051)')
 
 plt.title('Avg Seconds per Crossover vs Crossover, Dim = 128')
