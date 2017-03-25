@@ -9,9 +9,10 @@
 #include <limits.h>
 #include <unistd.h>
 
-#define threshold 90
 
+#define threshold 95
 
+// Initializes a new Matrix
 int **newMatrix(int d) {
     int **m = (int**) malloc(d * sizeof(int*));
 
@@ -55,7 +56,7 @@ int **add_matrix(int **a, int **b, int d, int neg) {
     return c;
 }
 
-
+// Standard Matrix Multiplicaiton
 int **standardmult(int **a, int **b, int **c, int d) {
     //int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
@@ -77,6 +78,7 @@ void freeMatrix(int d, int **a) {
     free(a);
 }
 
+// Normal Strassen
 int **strassen(int **x, int **y, int **z, int dim) {
     if (dim == 1) {
         z[0][0] = x[0][0] * y[0][0];
@@ -137,21 +139,17 @@ int **strassen(int **x, int **y, int **z, int dim) {
             }
         }
 
-        freeMatrix(half, b); freeMatrix(half, d);
-        freeMatrix(half, f); freeMatrix(half, h);
+        freeMatrix(half, b); freeMatrix(half, d); freeMatrix(half, f); freeMatrix(half, h);
         freeMatrix(half, p1); freeMatrix(half, p2); freeMatrix(half, p3); freeMatrix(half, p4);
         freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7);
-        return z;
 
+        return z;
     }
 }
 
 
-// Strassen's algorithm
+// Strassen Modified Algorithm
 int **strassenMod(int **x, int **y, int **z, int dim) {
-
-    //int **z = newMatrix(dim);
-    
     if (dim <= threshold)
         return standardmult(x, y, z, dim);
 
@@ -214,12 +212,11 @@ int **strassenMod(int **x, int **y, int **z, int dim) {
             }
         }
 
-        freeMatrix(half, b); freeMatrix(half, d);
-        freeMatrix(half, f); freeMatrix(half, h);
+        freeMatrix(half, b); freeMatrix(half, d); freeMatrix(half, f); freeMatrix(half, h);
         freeMatrix(half, p1); freeMatrix(half, p2); freeMatrix(half, p3); freeMatrix(half, p4);
         freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7);
-        return z;
 
+        return z;
     }
 }
 
@@ -256,11 +253,16 @@ int main(int argc, char *argv[]) {
     int dimension = atoi(argv[2]);
 
     int old = dimension;
-    clock_t t1, t2;
+    clock_t t1;
 
-    FILE *file;
+    FILE *fp;
 
-    file = fopen(argv[3], "r");
+    fp = fopen(argv[3], "r");
+
+    if (!fp) {      /* validate file is open */
+        fprintf (stderr, "Error: File failed to open.\n");
+        exit(EXIT_FAILURE);
+    }
 
     if (dimension > 2) {
         dimension = padding(dimension);
@@ -274,7 +276,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < dimension; i++){
         for(int j = 0; j < dimension; j++){
             if(i < old && j< old){
-                fscanf(file, "%d", &a[i][j]);
+                fscanf(fp, "%d", &a[i][j]);
             }
             else{
                 a[i][j]=0;
@@ -286,7 +288,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < dimension; i++){
         for(int j =0; j < dimension; j++){
             if(i < old && j< old){
-                fscanf(file, "%d", &b[i][j]);
+                fscanf(fp, "%d", &b[i][j]);
             }
             else{
                 b[i][j]=0;
@@ -294,35 +296,21 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (flag == 1) {
-        t1 = clock();
-        for (int x = 0; x < 10; x++) {
-            c = strassenMod(a, b, c, dimension);
-        }
-        t1 = clock() - t1;
-        double secs = ((double)t1) / CLOCKS_PER_SEC;
-        double time1 = secs / 10;
-        printf("strassenMod() took an average of %f seconds \n", time1);
-    }
-
-    if (flag == 2) {
-        t2 = clock();
-        for (int x = 0; x < 10; x++) {
-            c = standardmult(a, b, c, old);
-        }
-        t2 = clock() - t2;
-        double secs2 = ((double)t2) / CLOCKS_PER_SEC;
-        double time2 = secs2 / 10;
-        printf("standardmult() took an average of %f seconds \n", time2);
-    }
-    
+    t1 = clock();
     c = strassenMod(a, b, c, dimension);
+    t1 = clock() - t1;
+    double secs = ((double)t1) / CLOCKS_PER_SEC;
+
+    if (flag == 1) {
+        printf("strassenMod() took an average of %f seconds \n", secs);
+    }
 
     printDiags(old, c);
 
     freeMatrix(dimension, a);
     freeMatrix(dimension, b);
     freeMatrix(dimension, c);
+    fclose(fp);
 
     return 0;
 }
