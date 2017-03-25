@@ -199,8 +199,8 @@ int main(int argc, char *argv[]) {
 
     int avgTrial = 0;
     float avgSecs = 0.0;
-    int numtrials = 20;
-    int iterator = 5;
+    int numtrials = 2;
+    int iterator = 1;
 
     for (int p = 0; p < numtrials; p++) {
         printf("hehe\n");
@@ -253,8 +253,8 @@ int main(int argc, char *argv[]) {
             //printf("strassenMod() took %f seconds \n", secs);
             
             /*printf("wow %f, \n", d[0]);
-            printf("wow %f, \n", d[1]);
-            printDiags(old, c);*/
+            printf("wow %f, \n", d[1]);*/
+            //printDiags(old, c);
 
             freeMatrix(dimension, a);
             freeMatrix(dimension, b);
