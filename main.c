@@ -9,10 +9,9 @@
 #include <limits.h>
 #include <unistd.h>
 
-//#define threshold 83
-int timeTaken(int t, int d, int **a, int **b, int **c);
+#define threshold 1
 
-// Allocating a new matrix
+
 int **newMatrix(int d) {
     int **m = (int**) malloc(d * sizeof(int*));
 
@@ -36,16 +35,16 @@ int **genrand_Matrix(int d) {
 
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
-            m[i][j] = rand() % 50;
+            m[i][j] = rand() % 3;
         }
     }
 
     return m;
 }
 
-
 // Included in neg so that it's not necessary to create subtraction func
 int **add_matrix(int **a, int **b, int d, int neg) {
+
     int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
@@ -57,12 +56,12 @@ int **add_matrix(int **a, int **b, int d, int neg) {
 }
 
 
-// Conventional matrix multiplication
 int **standardmult(int **a, int **b, int **c, int d) {
+    //int **c = newMatrix(d);
     for (int i = 0; i < d; i++) {
         for (int j = 0; j < d; j++) {
             for (int k = 0; k < d; k++) {
-                c[i][k] = c[i][k] + a[i][j] * b[j][k];
+                c[i][k] += a[i][j] * b[j][k];
             }
         }
     }
@@ -76,21 +75,14 @@ void freeMatrix(int d, int **a) {
     }
 
     free(a);
-   // a = NULL;
 }
 
-// Strassen's Modified algorithm
-int **strassenMod(int **x, int **y, int **z, int dim, int t) {
+// Strassen's algorithm
+int **strassenMod(int **x, int **y, int **z, int dim) {
 
-   /*
-    int padded = d;
-
-    if (d != 1)
-        padded = (d%2==0)? d : d + 1;
-
-    z = newMatrix(d);*/
-
-    if (dim <= t)
+    //int **z = newMatrix(dim);
+    
+    if (dim <= threshold)
         return standardmult(x, y, z, dim);
 
     else if (dim == 1) {
@@ -98,7 +90,7 @@ int **strassenMod(int **x, int **y, int **z, int dim, int t) {
         return z;
     }
 
-    else {   
+    else {
         int half = dim / 2;
 
         int **a, **c, **e, **g;
@@ -131,14 +123,14 @@ int **strassenMod(int **x, int **y, int **z, int dim, int t) {
         g = &y[half];
 
 
-        strassenMod(add_matrix(a, b, half, 1), h, p2, half, t); // (A + B)H
-        strassenMod(add_matrix(c, d, half, 1), h, p3, half, t); // (C + D)H
-        strassenMod(d, add_matrix(g, e, half, -1), p4, half, t); // D(G - E)
-        strassenMod(add_matrix(a, d, half, 1), add_matrix(e, h, half, 1), p5, half, t); // (A + D)(E + H)
-        strassenMod(add_matrix(b, d, half, -1), add_matrix(g, h, half, 1), p6, half, t); // (B - D)(G + H)
-        strassenMod(add_matrix(a, c, half, -1), add_matrix(e, f, half, 1), p7, half, t); // (A - C)(E + F
+        strassenMod(a, add_matrix(f, h, half, -1), p1, half); // A(F − H)
+        strassenMod(add_matrix(a, b, half, 1), h, p2, half); // (A + B)H
+        strassenMod(add_matrix(c, d, half, 1), e, p3, half); // (C + D)E
+        strassenMod(d, add_matrix(g, e, half, -1), p4, half); // D(G - E)
+        strassenMod(add_matrix(a, d, half, 1), add_matrix(e, h, half, 1), p5, half); // (A + D)(E + H)
+        strassenMod(add_matrix(b, d, half, -1), add_matrix(g, h, half, 1), p6, half); // (B - D)(G + H)
+        strassenMod(add_matrix(a, c, half, -1), add_matrix(e, f, half, 1), p7, half); // (A - C)(E + F)
 
-        
         for (int i = 0; i < half; i++) {
             for (int j = 0; j < half; j++) {
                 // AE + BG = P5 + P4 - P2 + P6
@@ -152,155 +144,106 @@ int **strassenMod(int **x, int **y, int **z, int dim, int t) {
             }
         }
 
-        
-
-        freeMatrix(half, b); freeMatrix(half, d); freeMatrix(half, f); freeMatrix(half, h);
+        freeMatrix(half, b); freeMatrix(half, d);
+        freeMatrix(half, f); freeMatrix(half, h);
         freeMatrix(half, p1); freeMatrix(half, p2); freeMatrix(half, p3); freeMatrix(half, p4);
-        freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7); 
-
+        freeMatrix(half, p5); freeMatrix(half, p6); freeMatrix(half, p7);
         return z;
-    }
 
-    printf("%d\n", dim);
+    }
 }
 
 // Padding 
-int padding(int d, int t) {
-    int cnt = d;
-    while (cnt > t) {
-        cnt = (cnt + 1) / 2;
-    }
-    //printf("%d\n", cnt);
-
-    while (cnt < d) {
-        cnt *= 2;
+int padding(int d) {
+    int tmp = d;
+    while (tmp > threshold) {
+        tmp = (tmp + 1) / 2;
     }
 
-    return cnt;
+    while (tmp < d) {
+        tmp *= 2;
+    }
+
+    return tmp;
 }
 
 void printDiags(int d, int **a) {
+// only print the diagonals, ignore the paddings
     for (int i = 0; i < d; i++){
         printf("%d\n", a[i][i]);
     }
+    printf("\n");
 }
-
-void testing(int d, int **x) {
-    //assert(padding(7) == )
-}
-
 
 int main(int argc, char *argv[]) {
 
     // Error Handling
-    if (argc != 5) {
-        printf("Format is: ./strassen flag dimension inputfile threshold");
+    if (argc != 4) {
+        printf("Format is: ./strassen flag dimension inputfile");
         return 1;
     }
 
     int flag = atoi(argv[1]);
     int dimension = atoi(argv[2]);
-    int t = atoi(argv[4]);
-
-    clock_t t1;
 
     int old = dimension;
+    clock_t t1;
 
     FILE *file;
 
     file = fopen(argv[3], "r");
 
-    float d[t];
-
-    float cool = 0.0;
-    float wow = 0.0;
-
-    int avgTrial = 0;
-    float avgSecs = 0.0;
-    int numtrials = 1;
-
-    for (int k = 0; k < numtrials; k ++) {
-        printf("cool\n");
-        for (int i = 1; i <= t; i++) {
-            if (dimension > 2) {
-                dimension = padding(dimension, i);
-            }
-
-            int **a = newMatrix(dimension);
-            int **b = newMatrix(dimension);
-            int **c = newMatrix(dimension);
-
-            
-
-            // Takes care of padding for first matrix
-            for (int i = 0; i < dimension; i++){
-                for(int j = 0; j < dimension; j++){
-                    if(i < old && j< old){
-                        fscanf(file, "%d", &a[i][j]);
-                    }
-                    else{
-                        a[i][j]=0;
-                    }
-                }
-            }
-
-            // Takes care of padding for second matrix
-            for (int i = 0; i < dimension; i++){
-                for(int j =0; j < dimension; j++){
-                    if(i < old && j< old){
-                        fscanf(file, "%d", &b[i][j]);
-                    }
-                    else{
-                        b[i][j]=0;
-                    }
-                }
-            }
-
-            t1 = clock();
-            /*for (int j = 0; j < 1; j++) {
-                c = strassenMod(a, b, c, dimension, i);
-            }*/
-            c = strassenMod(a, b, c, dimension, i);
-            t1 = clock() - t1;
-            double secs = ((double)t1) / CLOCKS_PER_SEC;
-
-            //double tmp2 = secs / 5;
-            //printf("strassenMod() took %f seconds \n", secs);
-
-            d[i] = secs;
-
-
-            printf("%f, ", d[i]);
-            
-            //printf("%f", d[i]);
-
-            //printDiags(old, c);
-            
-            freeMatrix(dimension, a);
-            freeMatrix(dimension, b);
-            freeMatrix(dimension, c);
-
-        }
-        //printf("%d\n", avgTrial);
-
-        //printf("%f", min(t, d));
-        int location = 1;
-
-        float minimum = d[1];
-     
-            for (int x = 2 ; x < t ; x++ ) {
-                if (d[x] < minimum ) {
-                    minimum = d[x];
-                    location = x+1;
-                }  
-            } 
-
-        avgSecs += minimum;
-        avgTrial += location;
+    if (dimension > 2) {
+        dimension = padding(dimension);
     }
+
+    int **a = newMatrix(dimension);
+    int **b = newMatrix(dimension);
+    int **c = newMatrix(dimension);
+
+    // Takes care of padding for first matrix
+    for (int i = 0; i < dimension; i++){
+        for(int j = 0; j < dimension; j++){
+            if(i < old && j< old){
+                fscanf(file, "%d", &a[i][j]);
+            }
+            else{
+                a[i][j]=0;
+            }
+        }
+    }
+
+    // Takes care of padding for second matrix
+    for (int i = 0; i < dimension; i++){
+        for(int j =0; j < dimension; j++){
+            if(i < old && j< old){
+                fscanf(file, "%d", &b[i][j]);
+            }
+            else{
+                b[i][j]=0;
+            }
+        }
+    }
+
+    if (flag == 2) {
+        a = genrand_Matrix(dimension);
+        b = genrand_Matrix(dimension);
+    }
+
+
+    t1 = clock();
+    c = strassenMod(a, b, c, dimension);
+    t1 = clock() - t1;
+    double secs = ((double)t1) / CLOCKS_PER_SEC;
+
+    printf("strassenMod() took %f seconds \n", secs);
     
-    printf("trial: %d, seconds: %f \n", avgTrial / numtrials, avgSecs / numtrials);
-    //printf("Minimum element is present at location %d and it's value is %f.\n", location, minimum);
+
+    printDiags(old, c);
+
+    freeMatrix(dimension, a);
+    freeMatrix(dimension, b);
+    freeMatrix(dimension, c);
 
     return 0;
 }
